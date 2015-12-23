@@ -10,15 +10,15 @@ apt-get install -qy wget libc6:i386 libncurses5:i386 libstdc++6:i386 unzip
 TWONKY_URL=$(curl -sL http://twonky.com/downloads/ | sed -nr 's#.*href="(.+?/twonky-i686-glibc-.+?\.zip)".*#\1#p')
 TWONKY_VERSION=$(echo $TWONKY_URL | sed -nr 's#.*twonky-i686-glibc-.+?-(.+?)\.zip.*#\1#p')
 TWONKY_ZIP=/tmp/twonkyserver_${TWONKY_VERSION}.zip
-TWINKY_DIR=/usr/local/twonky
+TWONKY_DIR=/usr/local/twonky
 
 wget -q "$TWONKY_URL" -O $TWONKY_ZIP
 
 if [ $? -eq 0 ]; then
-    mkdir -p $TWINKY_DIR
-    unzip -d $TWINKY_DIR -o $TWONKY_ZIP
+    mkdir -p $TWONKY_DIR
+    unzip -d $TWONKY_DIR -o $TWONKY_ZIP
     rm -f $TWONKY_ZIP
-    chmod 700 $TWINKY_DIR/twonkys* $TWINKY_DIR/cgi-bin/* $TWINKY_DIR/plugins/* $TWINKY_DIR/twonky.sh
+    chmod 700 $TWONKY_DIR/twonkys* $TWONKY_DIR/cgi-bin/* $TWONKY_DIR/plugins/* $TWONKY_DIR/twonky.sh
     echo $TWONKY_VERSION > /tmp/version
 fi
 
