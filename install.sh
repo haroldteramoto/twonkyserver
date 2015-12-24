@@ -2,13 +2,13 @@
 # chfn workaround - Known issue within Dockers
 ln -s -f /bin/true /usr/bin/chfn
 
-dpkg --add-architecture i386
 sed 's#archive.ubuntu.com#us.archive.ubuntu.com#' -i /etc/apt/sources.list
-apt-get -q update
-apt-get install -qy wget libc6:i386 libncurses5:i386 libstdc++6:i386 unzip
+apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold"
+apt-get install -qy wget unzip
 
 TWONKY_URL=$(curl -sL http://twonky.com/downloads/ | sed -nr 's#.*href="(.+?/twonky-i686-glibc-.+?\.zip)".*#\1#p')
 TWONKY_VERSION=$(echo $TWONKY_URL | sed -nr 's#.*twonky-i686-glibc-.+?-(.+?)\.zip.*#\1#p')
+TWONKY_URL=$(curl -sL http://twonkyforum.com/downloads/8.2/ | sed -nr 's#.*href="(twonky-x86-64-glibc-.+?\.zip)".*#http://twonkyforum.com/downloads/8.2/\1#p')
 TWONKY_ZIP=/tmp/twonkyserver_${TWONKY_VERSION}.zip
 TWONKY_DIR=/usr/local/twonky
 
@@ -19,13 +19,10 @@ if [ $? -eq 0 ]; then
     unzip -d $TWONKY_DIR -o $TWONKY_ZIP
     rm -f $TWONKY_ZIP
     chmod 700 $TWONKY_DIR/twonkys* $TWONKY_DIR/cgi-bin/* $TWONKY_DIR/plugins/* $TWONKY_DIR/twonky.sh
+    useradd twonky -c "Twonkyserver" -d /config -g 100 -M -u 99 -s /bin/bash -p $(openssl rand -base64 32)
+    chown -R twonky:users $TWONKY_DIR
+    sed -i 's/"\$TWONKYSRV"/su twonky -c "\$TWONKYSRV"/g' $TWONKY_DIR/twonky.sh
+    mkdir -p /config/.twonky
+    chown -R twonky:users /config
     echo $TWONKY_VERSION > /tmp/version
 fi
-
-# Add Twonyserver to runit
-mkdir -p /etc/service/twonky
-cat <<'EOT' > /etc/service/twonky/run
-#!/bin/bash
-exec /usr/local/twonky/twonky.sh start
-EOT
-chmod +x /etc/service/twonky/run
