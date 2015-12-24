@@ -1,8 +1,5 @@
 FROM phusion/baseimage:0.9.18
-MAINTAINER Denis Laventure <denis.laventure@gmail.com>
-#Based on the work of needo <needo@superhero.org>
-#Based on the work of Eric Schultz <eric@startuperic.com>
-#Thanks to Tim Haak <tim@haak.co.uk>
+MAINTAINER dlaventu
 
 # Set correct environment variables
 ENV DEBIAN_FRONTEND="noninteractive" HOME="/root" LC_ALL="C.UTF-8" LANG="en_US.UTF-8" LANGUAGE="en_US.UTF-8"
