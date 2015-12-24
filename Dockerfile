@@ -7,7 +7,10 @@ MAINTAINER Denis Laventure <denis.laventure@gmail.com>
 # Set correct environment variables
 ENV DEBIAN_FRONTEND="noninteractive" HOME="/root" LC_ALL="C.UTF-8" LANG="en_US.UTF-8" LANGUAGE="en_US.UTF-8"
 
-# Install Plex
+RUN mkdir -p /etc/service/twonky
+ADD twonky.sh /etc/service/twonky/run
+RUN chmod +x /etc/service/twonky/run
+
 ADD install.sh /
 RUN bash /install.sh
 
