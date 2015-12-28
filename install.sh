@@ -26,4 +26,10 @@ if [ $? -eq 0 ]; then
     echo $TWONKY_VERSION > /tmp/version
 fi
 
+# clean up
+apt-get clean && \
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+/usr/share/man /usr/share/groff /usr/share/info \
+/usr/share/lintian /usr/share/linda /var/cache/man
+
 # End
