@@ -1,10 +1,33 @@
 #!/bin/bash
-# chfn workaround - Known issue within Dockers
-ln -s -f /bin/true /usr/bin/chfn
 
-sed 's#archive.ubuntu.com#us.archive.ubuntu.com#' -i /etc/apt/sources.list
-apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold"
-apt-get install -qy wget unzip
+# Configure user nobody to match unRAID's settings
+export DEBIAN_FRONTEND="noninteractive"
+groupmod -g 100 users
+usermod -u 99 nobody
+usermod -g 100 nobody
+usermod -d /home nobody
+chown -R nobody:users /home
+
+# Disable SSH
+rm -rf /etc/service/sshd /etc/my_init.d/00_regen_ssh_host_keys.sh
+
+#########################################
+##  FILES, SERVICES AND CONFIGURATION  ##
+#########################################
+# Twonkyserver
+mkdir -p /etc/service/twonky
+cat <<'EOT' > /etc/service/twonky/run
+#!/bin/bash
+exec /sbin/setuser nobody /usr/local/twonky/twonkyserver
+EOT
+
+chmod -R +x /etc/service/ /etc/my_init.d/
+
+#########################################
+##    REPOSITORIES AND DEPENDENCIES    ##
+#########################################
+apt-get update -qq
+apt-get install -qy --force-yes wget unzip
 
 TWONKY_URL=$(curl -sL http://twonky.com/downloads/ | sed -nr 's#.*href="(.+?/twonky-i686-glibc-.+?\.zip)".*#\1#p')
 TWONKY_VERSION=$(echo $TWONKY_URL | sed -nr 's#.*twonky-i686-glibc-.+?-(.+?)\.zip.*#\1#p')
@@ -18,18 +41,15 @@ if [ $? -eq 0 ]; then
     mkdir -p $TWONKY_DIR
     unzip -d $TWONKY_DIR -o $TWONKY_ZIP
     rm -f $TWONKY_ZIP
-    chmod 700 $TWONKY_DIR/twonkys* $TWONKY_DIR/cgi-bin/* $TWONKY_DIR/plugins/*
-    useradd twonky -c "Twonkyserver" -d /config -g 100 -M -u 99 -s /bin/bash -p $(openssl rand -base64 32)
-    chown -R twonky:users $TWONKY_DIR
+    chmod -R +x $TWONKY_DIR
+    chown -R nobody:users $TWONKY_DIR
     mkdir -p /config/.twonky
-    chown -R twonky:users /config
-    echo $TWONKY_VERSION > /tmp/version
+    chown -R nobody:users /config
 fi
 
-# clean up
-apt-get clean && \
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-/usr/share/man /usr/share/groff /usr/share/info \
-/usr/share/lintian /usr/share/linda /var/cache/man
-
-# End
+#########################################
+##                 CLEANUP             ##
+#########################################
+# Clean APT install files
+apt-get clean -y
+rm -rf /var/lib/apt/lists/* /var/cache/* /var/tmp/* /tmp/*

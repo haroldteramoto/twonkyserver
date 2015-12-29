@@ -1,20 +1,25 @@
 FROM phusion/baseimage:0.9.18
-MAINTAINER dlaventu
+MAINTAINER dlaventu <denis.laventure@gmail.com>
 
+#########################################
+##        ENVIRONMENTAL CONFIG         ##
+#########################################
 # Set correct environment variables
 ENV DEBIAN_FRONTEND="noninteractive" HOME="/root" LC_ALL="C.UTF-8" LANG="en_US.UTF-8" LANGUAGE="en_US.UTF-8"
 
-RUN mkdir -p /etc/service/twonky
-ADD twonky.sh /etc/service/twonky/run
-RUN chmod +x /etc/service/twonky/run
+# Use baseimage-docker's init system
+CMD ["/sbin/my_init"]
 
-ADD install.sh /
-RUN bash /install.sh
+#########################################
+##         RUN INSTALL SCRIPT          ##
+#########################################
+ADD install.sh /tmp/
+RUN bash /tmp/install.sh
 
+#########################################
+##         EXPORTS AND VOLUMES         ##
+#########################################
 VOLUME /config
 VOLUME /data
 
 EXPOSE 1030/udp 1900/udp 9000/tcp
-
-# Use baseimage-docker's init system
-CMD ["/sbin/my_init"]
