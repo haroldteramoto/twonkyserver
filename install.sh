@@ -5,8 +5,8 @@ export DEBIAN_FRONTEND="noninteractive"
 groupmod -g 100 users
 usermod -u 99 nobody
 usermod -g 100 nobody
-usermod -d /home nobody
-chown -R nobody:users /home
+usermod -d /config nobody
+chown -R nobody:users /config
 
 # Disable SSH
 rm -rf /etc/service/sshd /etc/my_init.d/00_regen_ssh_host_keys.sh
