@@ -1,5 +1,4 @@
 FROM phusion/baseimage:0.9.18
-MAINTAINER dlaventu <denis.laventure@gmail.com>
 
 #########################################
 ##        ENVIRONMENTAL CONFIG         ##
