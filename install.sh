@@ -26,8 +26,10 @@ chmod -R +x /etc/service/ /etc/my_init.d/
 #########################################
 ##    REPOSITORIES AND DEPENDENCIES    ##
 #########################################
+add-apt-repository -y ppa:jonathonf/ffmpeg-3
 apt-get update -qq
 apt-get install -qy --force-yes wget unzip
+apt-get install -y libavfilter6 libopencv-core2.4 libavdevice57 ffmpeg
 
 TWONKY_URL=$(curl -sL http://twonky.com/downloads/ | sed -nr 's#.*href="(.+?/twonky-i686-glibc-.+?\.zip)".*#\1#p')
 TWONKY_VERSION=$(echo $TWONKY_URL | sed -nr 's#.*twonky-i686-glibc-.+?-(.+?)\.zip.*#\1#p')
@@ -41,6 +43,7 @@ if [ $? -eq 0 ]; then
     mkdir -p $TWONKY_DIR
     unzip -d $TWONKY_DIR -o $TWONKY_ZIP
     rm -f $TWONKY_ZIP
+    cp /usr/bin/ffmpeg $TWONKY_DIR/cgi-bin/.
     chmod -R +x $TWONKY_DIR
     chown -R nobody:users $TWONKY_DIR
     mkdir -p /config/.twonky
